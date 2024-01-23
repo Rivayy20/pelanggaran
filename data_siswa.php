@@ -1,3 +1,10 @@
+<?php
+    session_start();
+    if (!isset($_SESSION['username'])){
+        header("Location: login.php");
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -257,27 +264,14 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo $_SESSION['username']; ?></span>
                                 <img class="img-profile rounded-circle"
                                     src="img/undraw_profile.svg">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Settings
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Activity Log
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                <a class="dropdown-item" href="action_logout.php">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
@@ -298,7 +292,7 @@
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Data hari ini [<?=date('d-m-Y')?>]</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Tanggal hari ini [<?=date('d-m-Y')?>]</h6>
                         </div>
                         <div class="card-body">
 
@@ -351,71 +345,7 @@
                         </div>
 
                         <!-- Modal PROFIL-->
-                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Profil Siswa</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                            <form action="" method="post">
-                        <?php
-                            include "koneksi.php";
-                            $id = $_GET['id'];
-                            $hasil = mysqli_query($koneksi, "SELECT * FROM data_siswa WHERE id_siswa ='$id'");
-                            $row = mysqli_fetch_assoc($hasil);
-                        ?>
-                            <div class="mb-3">
-                                <label class="form-label">Nama Siswa</label>
-                                <input type="hidden" name="id_siswa" value="<?=$row['id_siswa']?>"/>
-                                <input type="text" class="form-control" name="nama_siswa" value="<?=$row['nama_siswa']?>" disabled>
-                                <input type="hidden" name="id_siswa" value="<?=$row['id_siswa']?>"/>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Kelas</label>
-                                <input type="text" class="form-control" name="kelas" value="<?=$row['kelas']?>" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Tipe Pelanggaran</label>
-                                <select class="form-select" name="id_kat" aria-label="Default select example">
-                                    <?php
-                                    $no = 1;
-                                    include "koneksi.php";
-                                    $hasil = mysqli_query($koneksi, "SELECT * FROM kat_pelanggaran");
-                                    while ($row1 = mysqli_fetch_assoc($hasil)) { ?>
-                                        <option name="id_kat" value="<?=$row1['id_kat']?>">
-                                        <?=$row1['tipe_pelanggaran']?> 
-                                        </option> <?php } ?>
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Tanggal Laporan</label>
-                                <input type="date" class="form-control" name="tanggal">
-                            </div>
-                            <button type="submit" class="btn btn-success" name="bsimpan1">Kirim</button>
-                            <a href="data_siswa.php" class="btn btn-danger" type="submit">Batal</a>
-                            <?php
-                                if(isset($_POST['bsimpan1'])){
-                                    include "koneksi.php";
-
-                                    $id_kat = $_POST['id_kat'];
-                                    $id_siswa = $_POST['id_siswa'];
-                                    $tanggal = $_POST['tanggal'];
-                                   
-                                    $query = "INSERT INTO list_pelanggaran VALUES (NULL,'$tanggal', '$id_kat', '$id_siswa'); ";
-                                    mysqli_query($koneksi, $query);
-                                }
-                                ?>
-                        </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
+                       
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
@@ -440,11 +370,67 @@
                                         <td><?= $data['nama_siswa'] ?></td>
                                         <td><?= $data['kelas'] ?></td>
                                         <td>
-                                            <a href="data_siswa.php?id=<?= $data['id_siswa']; ?>" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal">Profil</a>
+                                            <a href="data_siswa.php?id=<?= $data['id_siswa']; ?>" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal<?=$data['id_siswa']?>">Profil</a>
                                             <a href="sis.php?id=<?= $data['id_siswa']; ?>" class="btn btn-success">Tambah Pelanggaran</a>
                                             <a href="hapusdatsis.php?id_siswa=<?php echo $data ['id_siswa']; ?>" class="btn btn-danger">Hapus</a>
                                         </td>
                                     </tr>
+                                    <div class="modal fade" id="exampleModal<?=$data['id_siswa']?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Profil Siswa</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                            <form action="" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Siswa</label>
+                                <input type="hidden" name="id_siswa" value="<?=$data['id_siswa']?>"/>
+                                <input type="text" class="form-control" name="nama_siswa" value="<?=$data['nama_siswa']?>" disabled>
+                                <input type="hidden" name="id_siswa" value="<?=$data['id_siswa']?>"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Kelas</label>
+                                <input type="text" class="form-control" name="kelas" value="<?=$data['kelas']?>" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tipe Pelanggaran</label>
+                                <?php
+                                    include "koneksi.php";
+                                    $id = $data['id_siswa'];
+                                   
+                                    
+                                    $hasil = mysqli_query($koneksi, "SELECT * FROM list_pelanggaran WHERE id_siswa = '$id'");
+                                    while ($row1 = mysqli_fetch_assoc($hasil))
+                                     echo $row1['id_list'];  
+                                    ?>
+                               
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal Laporan</label>
+                                <input type="date" class="form-control" name="tanggal">
+                            </div>
+                            <?php
+                                if(isset($_POST['bsimpan1'])){
+                                    include "koneksi.php";
+
+                                    $id_kat = $_POST['id_kat'];
+                                    $id_siswa = $_POST['id_siswa'];
+                                    $tanggal = $_POST['tanggal'];
+                                   
+                                    $query = "INSERT INTO list_pelanggaran VALUES (NULL,'$tanggal', '$id_kat', '$id_siswa'); ";
+                                    mysqli_query($koneksi, $query);
+                                }
+                                ?>
+                        </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
                                     <?php } ?>
                                     </tbody>
                                 </table>
